@@ -15,10 +15,10 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-741
-23
-1178
-461
+376
+18
+813
+456
 -1
 -1
 13.0
@@ -42,10 +42,10 @@ ticks
 30.0
 
 BUTTON
-46
-36
-112
-69
+37
+31
+103
+64
 NIL
 setup
 NIL
@@ -59,10 +59,10 @@ NIL
 1
 
 BUTTON
-43
-107
-106
-140
+36
+84
+99
+117
 NIL
 go
 T
@@ -76,25 +76,25 @@ NIL
 1
 
 SLIDER
-73
-225
-245
-258
+35
+152
+207
+185
 value
 value
 0
 100
-49.0
+50.0
 1
 1
 NIL
 HORIZONTAL
 
 SWITCH
-79
-291
-182
-324
+140
+84
+243
+117
 switch
 switch
 1
@@ -102,20 +102,20 @@ switch
 -1000
 
 CHOOSER
-90
-371
-228
-416
+35
+217
+173
+262
 global
 global
 "a"
 0
 
 PLOT
-433
-457
-633
-607
+35
+290
+235
+440
 plot 1
 NIL
 NIL
@@ -130,10 +130,10 @@ PENS
 "default" 1.0 0 -16777216 true "" "plot count turtles"
 
 MONITOR
-316
-287
-385
-332
+262
+291
+331
+336
 NIL
 report
 17
@@ -141,17 +141,17 @@ report
 11
 
 OUTPUT
-337
-196
-577
-250
+33
+461
+273
+515
 12
 
 TEXTBOX
-78
-543
-228
-561
+36
+549
+186
+567
 comment
 12
 0.0
