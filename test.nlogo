@@ -12,6 +12,7 @@ end
 to go
   set a a + 1
   forward 1
+  wait 0.1
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
