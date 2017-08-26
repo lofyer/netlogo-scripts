@@ -1,8 +1,9 @@
 turtles-own [a b c]
+globals [ zone ]
 
 to setup
   clear-all
-  create-turtles 10 [
+  create-turtles 20 [
     setxy random-xcor random-ycor
     set color random(255)
   ]
@@ -10,9 +11,15 @@ to setup
 end
 
 to go
-  set a a + 1
-  forward 1
-  wait 0.1
+  ask turtles [
+    lt random 90
+    rt random 90
+    wait 0.001
+    forward 0.5
+    set a a + 1
+    ifelse ( xcor < 0 and ycor < 0 ) [ set b 1 ] [ set b 0 ]
+    ifelse ( track = True ) [ pen-down ] [ pen-up ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
@@ -69,7 +76,7 @@ go
 T
 1
 T
-TURTLE
+OBSERVER
 NIL
 NIL
 NIL
@@ -94,10 +101,10 @@ HORIZONTAL
 SWITCH
 140
 84
-243
+253
 117
-switch
-switch
+track
+track
 1
 1
 -1000
@@ -117,26 +124,26 @@ PLOT
 290
 235
 440
-plot 1
+number of left
 NIL
 NIL
 0.0
 10.0
 0.0
-10.0
+20.0
 true
-false
+true
 "" ""
 PENS
-"default" 1.0 0 -16777216 true "" "plot count turtles"
+"count-of-a" 1.0 1 -16777216 true "" "plot count turtles with [ b = 1 ]"
 
 MONITOR
-262
-291
-331
-336
+180
+220
+400
+265
 NIL
-report
+[ a ] of one-of turtles
 17
 1
 11
