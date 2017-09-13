@@ -1,20 +1,46 @@
 turtles-own [a b c]
 globals [ zone ]
+breed [ freemen freeman ]
+breed [ cars car ]
 
 to setup
   clear-all
-  create-turtles 20 [
+  set-default-shape freemen "person"
+  set-default-shape cars "default"
+
+  create-cars num-of-turtles [
     setxy random-xcor random-ycor
-    set color random(255)
+    if color-of-turtles = "random" [
+      set color random(255)
+    ]
+    if color-of-turtles = "red" [
+      set color red
+    ]
+   if color-of-turtles = "green" [
+      set color green
+    ]
+   if color-of-turtles = "blue" [
+      set color blue
+    ]
   ]
+
+  create-freemen 1 [
+    set color yellow
+    set xcor 0
+    set ycor 0
+  ]
+
+  ask n-of 5 patches [
+    set pcolor white
+  ]
+
   reset-ticks
 end
 
 to go
-  ask turtles [
+  ask cars [
     lt random 90
     rt random 90
-    wait 0.001
     forward 0.5
     set a a + 1
     ifelse ( xcor < 0 and ycor < 0 ) [ set b 1 ] [ set b 0 ]
@@ -23,10 +49,10 @@ to go
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-376
-18
-813
-456
+364
+10
+801
+448
 -1
 -1
 13.0
@@ -88,11 +114,11 @@ SLIDER
 152
 207
 185
-value
-value
+num-of-turtles
+num-of-turtles
 0
 100
-50.0
+20.0
 1
 1
 NIL
@@ -114,10 +140,10 @@ CHOOSER
 217
 173
 262
-global
-global
-"a"
-0
+color-of-turtles
+color-of-turtles
+"random" "red" "green" "blue"
+2
 
 PLOT
 35
@@ -138,10 +164,10 @@ PENS
 "count-of-a" 1.0 1 -16777216 true "" "plot count turtles with [ b = 1 ]"
 
 MONITOR
-180
-220
-400
-265
+35
+451
+255
+496
 NIL
 [ a ] of one-of turtles
 17
@@ -149,17 +175,17 @@ NIL
 11
 
 OUTPUT
-33
-461
-273
-515
+30
+507
+270
+561
 12
 
 TEXTBOX
-36
-549
-186
-567
+420
+522
+570
+540
 comment
 12
 0.0
@@ -507,7 +533,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.0.1
+NetLogo 6.0.2
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
