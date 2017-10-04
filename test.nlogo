@@ -46,6 +46,7 @@ to go
     ifelse ( xcor < 0 and ycor < 0 ) [ set b 1 ] [ set b 0 ]
     ifelse ( track = True ) [ pen-down ] [ pen-up ]
   ]
+  wait 0.01
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
