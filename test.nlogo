@@ -50,10 +50,10 @@ to go
     ifelse any? cars-on patch-here [
       set color red
       set collision collision + 1
-      plot collision
     ]
     [ set color yellow ]
   ]
+  plot collision
   wait 0.01
 end
 @#$#@#$#@
@@ -127,7 +127,7 @@ num-of-turtles
 num-of-turtles
 0
 100
-100.0
+38.0
 1
 1
 NIL
@@ -163,7 +163,7 @@ number of crash
 time
 collisions
 0.0
-200.0
+3000.0
 0.0
 200.0
 true
