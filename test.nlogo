@@ -1,7 +1,7 @@
-turtles-own [a b c]
-globals [ zone ]
+globals [ zone collision ]
 breed [ freemen freeman ]
 breed [ cars car ]
+turtles-own [ crash1 b ]
 
 to setup
   clear-all
@@ -42,9 +42,17 @@ to go
     lt random 90
     rt random 90
     forward 0.5
-    set a a + 1
     ifelse ( xcor < 0 and ycor < 0 ) [ set b 1 ] [ set b 0 ]
     ifelse ( track = True ) [ pen-down ] [ pen-up ]
+    if pcolor = white [ set pcolor red ]
+  ]
+  ask freemen [
+    ifelse any? cars-on patch-here [
+      set color red
+      set collision collision + 1
+      plot collision
+    ]
+    [ set color yellow ]
   ]
   wait 0.01
 end
@@ -119,7 +127,7 @@ num-of-turtles
 num-of-turtles
 0
 100
-20.0
+100.0
 1
 1
 NIL
@@ -144,25 +152,25 @@ CHOOSER
 color-of-turtles
 color-of-turtles
 "random" "red" "green" "blue"
-2
+0
 
 PLOT
 35
 290
-235
+326
 440
-number of left
-NIL
-NIL
+number of crash
+time
+collisions
 0.0
-10.0
+200.0
 0.0
-20.0
+200.0
 true
 true
 "" ""
 PENS
-"count-of-a" 1.0 1 -16777216 true "" "plot count turtles with [ b = 1 ]"
+"collisions" 1.0 0 -16777216 true "" ""
 
 MONITOR
 35
@@ -170,7 +178,7 @@ MONITOR
 255
 496
 NIL
-[ a ] of one-of turtles
+count turtles
 17
 1
 11
