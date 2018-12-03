@@ -1,94 +1,66 @@
-extensions [ vid bitmap ]
-
 globals [ zone collision ]
 breed [ freemen freeman ]
+breed [ countries country ]
 breed [ cars car ]
+breed [ agencies agency ]
+breed [ dividers divider ]
 turtles-own [ crash1 b ]
+
+patches-own [
+  port-type
+  region
+]
 
 to setup
   clear-all
-  set-default-shape freemen "person"
-  set-default-shape cars "default"
+  let region-a-color blue - 1
+  let region-b-color gray - 3.5
+  let input-port-color red - 2
+  let output-port-color yellow - 2
+  let blood-stream-color rgb 255 215 215
+  let divider-color gray - 1
 
-  create-cars num-of-turtles [
-    setxy random-xcor random-ycor
-    if color-of-turtles = "random" [
-      set color random(255)
+  set-default-shape dividers "square"
+
+  ask patches with [ pxcor < 0 ] [ set pcolor region-a-color ]
+  ask patches with [ pxcor > 0 ] [ set pcolor region-b-color ]
+  ask patches with [ pxcor > min-pxcor and pxcor < -1 ] [ set region "A" ]
+  ask patches with [ pxcor < max-pxcor and pxcor >  1 ] [ set region "B" ]
+  ask patches with [ region = "A" or region = "B" ] [ set pcolor blood-stream-color ]
+
+  ask patches with [ not member? pxcor (list min-pxcor -1 1 max-pxcor) ] [
+    if pycor = max-pycor [
+      set pcolor input-port-color
+      set port-type "input"
     ]
-    if color-of-turtles = "red" [
-      set color red
-    ]
-   if color-of-turtles = "green" [
-      set color green
-    ]
-   if color-of-turtles = "blue" [
-      set color blue
+    if pycor = min-pycor [
+      set pcolor output-port-color
+      set port-type "output"
     ]
   ]
 
-  create-freemen 1 [
-    set color yellow
-    set xcor 0
-    set ycor 0
+  ask patches with [ pxcor = 0 ] [
+    sprout 1 [
+      set breed dividers
+      set color divider-color
+      set size 1
+      set pcolor white
+    ]
   ]
-
-  ask n-of 5 patches [
-    set pcolor white
-  ]
-
-  reset-ticks
-end
-
-to show-camera
-  vid:camera-select
-  vid:start
-end
-
-to record
-  let width world-width * patch-size / 2
-  let height world-height * patch-size / 2
-  carefully [
-    let image (vid:capture-image width height)
-    bitmap:copy-to-drawing image 0 0
-    display
-  ] [
-    user-message error-message
-    stop
-  ]
-end
-
-to stop-recording
-  vid:close
 end
 
 to go
-  ask cars [
-    lt random 90
-    rt random 90
-    forward 0.5
-    ifelse ( xcor < 0 and ycor < 0 ) [ set b 1 ] [ set b 0 ]
-    ifelse ( track = True ) [ pen-down ] [ pen-up ]
-    if pcolor = white [ set pcolor red ]
-  ]
-  ask freemen [
-    ifelse any? cars-on patch-here [
-      set color red
-      set collision collision + 1
-    ]
-    [ set color yellow ]
-  ]
-  plot collision
-  wait 0.01
+
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-1004
-12
-1649
-658
+425
+35
+1266
+415
 -1
 -1
-13.0
+12.82
 1
 10
 1
@@ -98,10 +70,10 @@ GRAPHICS-WINDOW
 1
 1
 1
--24
-24
--24
-24
+-32
+32
+-14
+14
 0
 0
 1
@@ -109,11 +81,85 @@ ticks
 30.0
 
 BUTTON
-37
-31
-103
-64
+150
+55
+213
+88
+start
+go
 NIL
+1
+T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+PLOT
+1275
+35
+1475
+185
+num-of-player
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
+
+PLOT
+1275
+195
+1475
+345
+num-of-world-wealth
+NIL
+NIL
+0.0
+10.0
+0.0
+10.0
+true
+false
+"" ""
+PENS
+"default" 1.0 0 -16777216 true "" "plot count turtles"
+
+CHOOSER
+60
+145
+198
+190
+strategy
+strategy
+"plain" "random"
+0
+
+SWITCH
+60
+100
+221
+133
+hybrid-strategy?
+hybrid-strategy?
+1
+1
+-1000
+
+BUTTON
+60
+55
+122
+88
+setup
 setup
 NIL
 1
@@ -125,171 +171,10 @@ NIL
 NIL
 1
 
-BUTTON
-36
-84
-99
-117
-NIL
-go
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-SLIDER
-35
-152
-207
-185
-num-of-turtles
-num-of-turtles
-0
-100
-38.0
-1
-1
-NIL
-HORIZONTAL
-
-SWITCH
-140
-84
-253
-117
-track
-track
-1
-1
--1000
-
-CHOOSER
-35
-217
-173
-262
-color-of-turtles
-color-of-turtles
-"random" "red" "green" "blue"
-0
-
-PLOT
-35
-290
-326
-440
-number of crash
-time
-collisions
-0.0
-3000.0
-0.0
-200.0
-true
-true
-"" ""
-PENS
-"collisions" 1.0 0 -16777216 true "" ""
-
-MONITOR
-35
-451
-255
-496
-NIL
-count turtles
-17
-1
-11
-
-OUTPUT
-30
-507
-270
-561
-12
-
-TEXTBOX
-420
-522
-570
-540
-comment
-12
-0.0
-1
-
-BUTTON
-338
-88
-415
-121
-camera
-show-camera
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-346
-153
-419
-186
-NIL
-record
-T
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-BUTTON
-323
-191
-450
-224
-NIL
-stop-recording
-NIL
-1
-T
-OBSERVER
-NIL
-NIL
-NIL
-NIL
-1
-
-MONITOR
-388
-292
-488
-337
-camera status
-vid:status
-17
-1
-11
-
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+This is a model describing how forex market works.
 
 ## HOW IT WORKS
 
@@ -645,5 +530,5 @@ true
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 @#$#@#$#@
-0
+1
 @#$#@#$#@
