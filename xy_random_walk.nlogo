@@ -2,11 +2,17 @@ globals [ x y ]
 
 to setup
   clear-all
+  create-turtles 50
   set y 0
   reset-ticks
 end
 
 to go
+  ask turtles [
+    rt random 360
+    forward 1
+  ]
+
   set x random 2
   ifelse x = 1
     [ set y y + 1 ]
