@@ -1,39 +1,109 @@
-globals [ x predict_x ]
+extensions [ py ]
+
+breed [data-points data-point]
+breed [centroids centroid]
+
+data-points-own [
+  cluster-id
+]
+
+centroids-own [
+  cluster-id
+  centx
+  centy
+]
+
+globals [
+  testoutput
+  centroid-list
+]
 
 to setup
   clear-all
-  create-turtles 50
-  set predict_x 0
-  reset-ticks
-end
-
-to go
-  ask turtles [
-    rt random 360
-    forward 1
+  py:setup py:python
+  (py:run
+    "import tensorflow as tf"
+    "import numpy as np"
+  )
+  set testoutput py:runresult "1"
+  py:set "testoutput" testoutput
+  set-default-shape data-points "circle"
+  set-default-shape centroids "x"
+  generate-clusters
+  ; For python
+  py:set "num_points" num-clusters
+  py:set "points" [list xcor ycor] of data-points
+  py:set "num_clusters" num-clusters
+  py:set "num_round" num-round
+  if debug = True
+  [
+    py:run "print('Points Cordinates:', points)" ;for debug
   ]
-
-  set x random 2
-  ifelse x = 1
-    [
-      set predict_x 1
-    ]
-    [ set predict_x 0 ]
-  tick
+  ;reset-centroids
 end
 
-to-report value-of-predict_x
-  report predict_x
+to generate-clusters
+  set testoutput py:runresult "testoutput + 1"
+  let cluster-std-dev cluster-range
+  let cluster-size num-data-points / num-clusters
+  repeat num-clusters [
+    let center-x random-xcor / 1.5
+    let center-y random-ycor / 1.5
+    create-data-points cluster-size [
+      setxy center-x center-y
+      set heading random 360
+      fd abs random-normal 0 (cluster-std-dev / 2)
+    ]
+  ]
+end
+
+to train
+  ; Cluster center
+  (py:run
+    "points = np.asarray(points)"
+    "def input_fn():"
+    "    return tf.compat.v1.train.limit_epochs(tf.convert_to_tensor(points, dtype=tf.float32), num_epochs=1)"
+    "kmeans = tf.contrib.factorization.KMeansClustering(num_clusters=num_clusters, use_mini_batch=False)"
+    "num_iterations = num_round"
+    "previous_centers = None"
+    "for _ in range(num_iterations):"
+    "    kmeans.train(input_fn)"
+    "    cluster_centers = kmeans.cluster_centers()"
+    "    if previous_centers is not None:"
+    "        print(('delta:', cluster_centers - previous_centers))"
+    "    previous_centers = cluster_centers"
+    "    print(('score:', kmeans.score(input_fn)))"
+    "print(('cluster centers:', cluster_centers))"
+    "# map the input points to their clusters"
+    "cluster_indices = list(kmeans.predict_cluster_index(input_fn))"
+    "print('cluster indices: ', cluster_indices)"
+    "for i, point in enumerate(points):"
+    "    cluster_index = cluster_indices[i]"
+    "    center = cluster_centers[cluster_index]"
+    "    print(('point:', point, 'is in cluster', cluster_index, 'centered at', center))"
+  )
+end
+
+to show-shape
+  set centroid-list py:runresult "cluster_centers"
+  foreach centroid-list [
+    x -> create-centroids 1 [
+      set xcor ( item 0 x )
+      set ycor ( item 1 x )
+      set size 2
+      set color white
+    ]
+  ]
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-422
-18
-859
-456
+316
+16
+829
+530
 -1
 -1
-13.0
+5.0
 1
 10
 1
@@ -43,22 +113,52 @@ GRAPHICS-WINDOW
 1
 1
 1
--16
-16
--16
-16
-1
-1
+-50
+50
+-50
+50
+0
+0
 1
 ticks
 30.0
 
+SLIDER
+61
+31
+233
+64
+num-clusters
+num-clusters
+1
+20
+10.0
+1
+1
+NIL
+HORIZONTAL
+
+SLIDER
+60
+114
+232
+147
+num-data-points
+num-data-points
+1
+1000
+504.0
+1
+1
+NIL
+HORIZONTAL
+
 BUTTON
-76
-78
-142
-111
-setup
+108
+206
+174
+239
+Setup
 setup
 NIL
 1
@@ -71,13 +171,45 @@ NIL
 1
 
 BUTTON
-166
-88
-229
-121
+54
+252
+235
+285
+Run TensorFlow KMeans
+train
 NIL
-go
+1
 T
+OBSERVER
+NIL
+NIL
+NIL
+NIL
+1
+
+SLIDER
+60
+159
+232
+192
+cluster-range
+cluster-range
+0
+20
+2.0
+1
+1
+NIL
+HORIZONTAL
+
+BUTTON
+109
+295
+173
+328
+Show
+show-shape
+NIL
 1
 T
 OBSERVER
@@ -88,38 +220,78 @@ NIL
 1
 
 MONITOR
-86
-138
-161
-183
-predict_x
-value-of-predict_x
+111
+368
+168
+413
+output
+testoutput
 17
 1
 11
 
-PLOT
-42
-248
-368
-446
-plot 1
-x
-y
-0.0
+SWITCH
+89
+425
+192
+458
+debug
+debug
+1
+1
+-1000
+
+SLIDER
+61
+71
+233
+104
+num-round
+num-round
+0
+10
 10.0
--10.0
-10.0
-true
-false
-"" ""
-PENS
-"default" 1.0 0 -16777216 true "" "plot total_choices"
+1
+1
+NIL
+HORIZONTAL
 
 @#$#@#$#@
 ## WHAT IS IT?
 
-Change choice if this time fail
+(a general understanding of what the model is trying to show or explain)
+
+## HOW IT WORKS
+
+(what rules the agents use to create the overall behavior of the model)
+
+## HOW TO USE IT
+
+(how to use the model, including a description of each of the items in the Interface tab)
+
+## THINGS TO NOTICE
+
+(suggested things for the user to notice while running the model)
+
+## THINGS TO TRY
+
+(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+
+## EXTENDING THE MODEL
+
+(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
+
+## NETLOGO FEATURES
+
+(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
+
+## RELATED MODELS
+
+(models in the NetLogo Models Library and elsewhere which are of related interest)
+
+## CREDITS AND REFERENCES
+
+(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
 @#$#@#$#@
 default
 true
@@ -426,7 +598,7 @@ false
 Polygon -7500403 true true 270 75 225 30 30 225 75 270
 Polygon -7500403 true true 30 75 75 30 270 225 225 270
 @#$#@#$#@
-NetLogo 6.1.0
+NetLogo 6.1.1
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
