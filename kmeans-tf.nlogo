@@ -90,7 +90,7 @@ to show-shape
     x -> create-centroids 1 [
       set xcor ( item 0 x )
       set ycor ( item 1 x )
-      set size 2
+      set size 3
       set color white
     ]
   ]
@@ -196,7 +196,7 @@ cluster-range
 cluster-range
 0
 20
-2.0
+5.0
 1
 1
 NIL
